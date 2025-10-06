@@ -33,13 +33,65 @@ You can also rely on two key facts about the data ordering:
 > **Tip: Create a validation set**
 > Since all the sequences are independent and shuffled, you can create a reliable local validation set by splitting the sequences. For example, you could use the first 80% of the sequences for training and the remaining 20% for validation. You can split them by `seq_ix`.
 
-## Evaluation and metrics
+## Submission
+
+### Evaluation and metrics
 
 Predictions are evaluated using the **R²** (coefficient of determination) score.
 For each feature _i_, the score is calculated as:
 R²ᵢ = 1 - Σ(y_true - y_pred)² / Σ(y_true - y_mean)²
 The final score is the average of the R² scores across all N features.
 A higher R² score is better!
+
+### Required structure
+
+Your `solution.py` must define a class named `PredictionModel`. This class must have a `predict` method with the following signature:
+
+```python
+import numpy as np
+from utils import DataPoint
+
+class PredictionModel:
+    def __init__(self):
+        # Initialize your model, internal state, etc.
+        pass
+
+    def predict(self, data_point: DataPoint) -> np.ndarray | None:
+        # Your logic here.
+        if not data_point.need_prediction:
+            return None
+
+        # When a prediction is needed, return a numpy array of length N.
+        prediction = np.zeros(data_point.state.shape) # Replace with your model's output
+        return prediction
+```
+
+The `data_point` object passed to your `predict` method is an instance of the `DataPoint` class, which has the following attributes:
+
+- `seq_ix: int`: The ID for the current sequence.
+- `step_in_seq: int`: The step number within the sequence.
+- `need_prediction: bool`: Whether a prediction is required for this point.
+- `state: np.ndarray`: The current market state vector of N features.
+
+Your `predict` method should:
+
+- Return `None` when `need_prediction` is `False`.
+- Return a `numpy.ndarray` of shape `(N,)` when `need_prediction` is `True`.
+- Remember to manage and reset the model's state for each new sequence (`seq_ix`).
+
+### Packaging your solution
+
+Your solution might include more than just `solution.py` (e.g., model weight files, helper Python modules, configs). Make sure to include all necessary files in your zip archive.
+
+You can create the zip archive from your solution directory with a command like this:
+
+```bash
+# From inside your solution folder (e.g., my_awesome_solution/)
+# This command zips up everything in the current directory.
+zip -r ../solution.zip .
+```
+
+> **Note:** Make sure `solution.py` is at the root level inside the zip archive, not inside another folder.
 
 ### Ideas
 
